@@ -1,20 +1,7 @@
-import { useState } from 'react'
-import styled from 'styled-components'
-
+import { useMemo, useState } from 'react'
 import FormVagas from '../../components/FormVagas'
 import Vaga from '../../components/Vaga'
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const ListaContainer = styled.ul<any>`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-top: 32px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`
+import { VagasContainer } from './styles'
 
 type VagaType = {
   id: number
@@ -27,23 +14,23 @@ type VagaType = {
   requisitos: string[]
 }
 
-const vagasCabecalho: VagaType[] = [
+const vagas: VagaType[] = [
   {
     id: 1,
     titulo: 'Desenvolvedor front-end',
-    localizacao: 'são paulo (ead)',
-    nivel: 'júnior',
-    modalidade: 'clt',
+    localizacao: 'São Paulo (ead)',
+    nivel: 'Júnior',
+    modalidade: 'CLT',
     salarioMin: 3000,
     salarioMax: 4500,
-    requisitos: ['Html 5', 'Css 3', 'JavaScript', 'React']
+    requisitos: ['HTML 5', 'CSS 3', 'JavaScript', 'React']
   },
   {
     id: 2,
     titulo: 'Desenvolvedor NodeJS',
-    localizacao: 'rio de janeiro (ead)',
-    nivel: 'pleno',
-    modalidade: 'pj',
+    localizacao: 'Rio de Janeiro (ead)',
+    nivel: 'Pleno',
+    modalidade: 'PJ',
     salarioMin: 5000,
     salarioMax: 6500,
     requisitos: ['NodeJS', 'TypeScript', 'SQL']
@@ -51,9 +38,9 @@ const vagasCabecalho: VagaType[] = [
   {
     id: 3,
     titulo: 'Designer UI/UX',
-    localizacao: 'são paulo (presencial)',
-    nivel: 'júnior',
-    modalidade: 'clt',
+    localizacao: 'São Paulo (presencial)',
+    nivel: 'Júnior',
+    modalidade: 'CLT',
     salarioMin: 3000,
     salarioMax: 4000,
     requisitos: ['Figma', 'Adobe XD', 'Prototipagem']
@@ -61,9 +48,9 @@ const vagasCabecalho: VagaType[] = [
   {
     id: 4,
     titulo: 'Desenvolvedor Front-end React',
-    localizacao: 'são paulo (ead)',
-    nivel: 'senior',
-    modalidade: 'pj',
+    localizacao: 'São Paulo (ead)',
+    nivel: 'Sênior',
+    modalidade: 'PJ',
     salarioMin: 7000,
     salarioMax: 8500,
     requisitos: ['React', 'Styled Components', 'TypeScript']
@@ -71,9 +58,9 @@ const vagasCabecalho: VagaType[] = [
   {
     id: 5,
     titulo: 'Desenvolvedor Fullstack',
-    localizacao: 'são paulo (ead)',
-    nivel: 'pleno',
-    modalidade: 'clt',
+    localizacao: 'São Paulo (ead)',
+    nivel: 'Pleno',
+    modalidade: 'CLT',
     salarioMin: 6000,
     salarioMax: 7500,
     requisitos: ['Python', 'React', 'Docker']
@@ -81,9 +68,9 @@ const vagasCabecalho: VagaType[] = [
   {
     id: 6,
     titulo: 'Analista de QA',
-    localizacao: 'são paulo (ead)',
-    nivel: 'júnior',
-    modalidade: 'clt',
+    localizacao: 'São Paulo (ead)',
+    nivel: 'Júnior',
+    modalidade: 'CLT',
     salarioMin: 2500,
     salarioMax: 3500,
     requisitos: ['Testes Automatizados', 'Jest', 'Cypress']
@@ -91,30 +78,34 @@ const vagasCabecalho: VagaType[] = [
 ]
 
 const ListaVagas = () => {
-  const [filtro, setFiltro] = useState<string>('')
+  const [filtro, setFiltro] = useState('')
 
-  const vagasFiltradas = vagasCabecalho.filter(
-    (x) => x.titulo.toLocaleLowerCase().search(filtro) >= 0
-  )
+  const vagasFiltradas = useMemo(() => {
+    const termo = filtro.toLocaleLowerCase()
+    return vagas.filter((vaga) =>
+      [
+        vaga.titulo,
+        vaga.localizacao,
+        vaga.nivel,
+        vaga.modalidade,
+        ...vaga.requisitos
+      ]
+        .join(' ')
+        .toLocaleLowerCase()
+        .includes(termo)
+    )
+  }, [filtro])
 
   return (
-    <div>
-      <FormVagas aoPesquisar={(termo: string) => setFiltro(termo)} />
-      <ListaContainer>
-        {vagasFiltradas.map((object) => (
-          <Vaga
-            key={object.id}
-            titulo={object.titulo}
-            localizacao={object.localizacao}
-            nivel={object.nivel}
-            modalidade={object.modalidade}
-            salarioMin={object.salarioMin}
-            salarioMax={object.salarioMax}
-            requisitos={object.requisitos}
-          />
+    <>
+      <FormVagas aoPesquisar={setFiltro} />
+      <VagasContainer>
+        {vagasFiltradas.map((vaga) => (
+          <Vaga key={vaga.id} {...vaga} />
         ))}
-      </ListaContainer>
-    </div>
+        {vagasFiltradas.length === 0 && <p>Nenhuma vaga encontrada.</p>}
+      </VagasContainer>
+    </>
   )
 }
 

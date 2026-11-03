@@ -9,9 +9,11 @@ function App() {
       <EstiloGlobal />
       <Cabecalho />
       <Hero />
-      <Container>
-        <ListaVagas />
-      </Container>
+      <main>
+        <Container>
+          <ListaVagas />
+        </Container>
+      </main>
     </>
   )
 }
